@@ -14,6 +14,13 @@ use structopt::StructOpt;
 )]
 struct Opt {
     file: PathBuf,
+
+    #[structopt(
+        short = "n",
+        long = "negate",
+        help = "If set, then only those lines in stdin that are *not* in the given file are passed to stdout"
+    )]
+    negate: bool,
 }
 
 fn read_file(path: &Path) -> Result<Vec<String>, Error> {
@@ -43,7 +50,7 @@ fn main() {
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         let line = line.expect("Failed to read from stdin");
-        if regex.is_match(&line) {
+        if regex.is_match(&line) ^ args.negate {
             println!("{}", line);
         }
     }
